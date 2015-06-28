@@ -68,7 +68,7 @@ pub mod prelude;
         lisp!(__LIST__ $($elem),*)
     };
     
-    // operators and function calls
+    // parsers for unary and binary operators
     (__LIST__ -,    $arg:tt   ) => { lisp!(__UNARY_OP__  _neg,   $arg   ) };
     (__LIST__ !,    $arg:tt   ) => { lisp!(__UNARY_OP__  _not,   $arg   ) };
     (__LIST__ +,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _add, $($arg),*) };
@@ -88,11 +88,24 @@ pub mod prelude;
     (__LIST__ >=, $($arg:tt),*) => { lisp!(__BINARY_OP__ _ge,  $($arg),*) };
     (__LIST__ <=, $($arg:tt),*) => { lisp!(__BINARY_OP__ _le,  $($arg),*) };
 
-    (__UNARY_OP__  $op:ident, $a:tt)        => { lisp!(__LIST__ $op, $a) };
-    (__BINARY_OP__ $op:ident, $a:tt, $b:tt) => { lisp!(__LIST__ $op, $a, $b) };
+    // generically turn unary/binary operators into function calls
+    // binary operators can be used as n-ary operators through __REDUCE__
+    (__UNARY_OP__  $op:ident, $a:tt)        => { lisp!(__LIST__ $op, $a)      };
+    (__BINARY_OP__ $op:ident, $a:tt, $b:tt) => { lisp!(__LIST__ $op, $a, $b)  };
     (__BINARY_OP__ $op:ident, $a:tt, $b:tt, $($rest:tt),+) =>
-                                               { $op(lisp!($a),
-                                                     lisp!(__BINARY_OP__ $op, $b, $($rest),+)) };
+                                               { lisp!(__REDUCE__ $op,
+                                                                  ($op $a $b),
+                                                                  $($rest),+) };
+
+    // reduce implementation
+    (__REDUCE__ $op:ident, $acc:tt)                       => { lisp!($acc)                     };
+    (__REDUCE__ $op:ident, $acc:tt, $a:tt)                => { lisp!(__REDUCE__ $op,
+                                                                                ($op $acc $a)) };
+    (__REDUCE__ $op:ident, $acc:tt, $a:tt, $($rest:tt),+) => { lisp!(__REDUCE__ $op,
+                                                                                ($op $acc $a),
+                                                                                $($rest),+)    };
+
+    // function calls
     (__LIST__ $name:expr) => {
         lisp!($name)()
     };
