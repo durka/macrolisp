@@ -68,7 +68,25 @@ pub mod prelude;
         lisp!(__LIST__ $($elem),*)
     };
     
-    // call function
+    // operators and function calls
+    (__LIST__ +,  $a:tt, $b:tt) => { lisp!(__LIST__ _add, $a, $b) };
+    (__LIST__ &,  $a:tt, $b:tt) => { lisp!(__LIST__ _and, $a, $b) };
+    (__LIST__ |,  $a:tt, $b:tt) => { lisp!(__LIST__ _or,  $a, $b) };
+    (__LIST__ ^,  $a:tt, $b:tt) => { lisp!(__LIST__ _xor, $a, $b) };
+    (__LIST__ /,  $a:tt, $b:tt) => { lisp!(__LIST__ _div, $a, $b) };
+    (__LIST__ *,  $a:tt, $b:tt) => { lisp!(__LIST__ _mul, $a, $b) };
+    (__LIST__ %,  $a:tt, $b:tt) => { lisp!(__LIST__ _rem, $a, $b) };
+    (__LIST__ <<, $a:tt, $b:tt) => { lisp!(__LIST__ _shl, $a, $b) };
+    (__LIST__ >>, $a:tt, $b:tt) => { lisp!(__LIST__ _shr, $a, $b) };
+    (__LIST__ -,  $a:tt, $b:tt) => { lisp!(__LIST__ _sub, $a, $b) };
+    (__LIST__ -,  $a:tt       ) => { lisp!(__LIST__ _neg, $a    ) };
+    (__LIST__ !,  $a:tt       ) => { lisp!(__LIST__ _not, $a    ) };
+    (__LIST__ ==, $a:tt, $b:tt) => { lisp!(__LIST__ _eq,  $a, $b) };
+    (__LIST__ !=, $a:tt, $b:tt) => { lisp!(__LIST__ _ne,  $a, $b) };
+    (__LIST__ >,  $a:tt, $b:tt) => { lisp!(__LIST__ _gt,  $a, $b) };
+    (__LIST__ <,  $a:tt, $b:tt) => { lisp!(__LIST__ _lt,  $a, $b) };
+    (__LIST__ >=, $a:tt, $b:tt) => { lisp!(__LIST__ _ge,  $a, $b) };
+    (__LIST__ <=, $a:tt, $b:tt) => { lisp!(__LIST__ _le,  $a, $b) };
     (__LIST__ $name:expr) => {
         lisp!($name)()
     };
