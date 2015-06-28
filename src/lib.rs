@@ -32,12 +32,17 @@ pub mod prelude;
     ((_rust $body:block)) => {
         { $body }
     };
+
+    // list parsing
+    (($($elem:tt)*)) => {
+        lisp!(__LIST__ $($elem),*)
+    };
     
     // call function
-    (($name:expr)) => {
+    (__LIST__ $name:expr) => {
         (lisp!($name))()
     };
-    (($name:path : $($arg:tt)*)) => {
+    (__LIST__ $name:path, $($arg:tt),*) => {
         (lisp!($name))($(lisp!($arg)),*)
     };
     
