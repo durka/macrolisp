@@ -2,11 +2,11 @@ pub mod prelude;
 
 #[macro_export] macro_rules! lisp {
     // special forms
-    ((lambda ($(($argn:ident $argt:ty))* -> $ret:ty) $($body:tt)*)) => {
+    ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
         // regular lambda
         |$($argn:$argt),*| -> $ret { $(lisp!($body));* }
     };
-    ((lambda $s:ident ($(($argn:ident $argt:ty))* -> $ret:ty) $($body:tt)*)) => {{
+    ((lambda $s:ident (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {{
         // recursive lambda
         // $s MUST be "self"
         // recurse by calling (self ...)
@@ -29,7 +29,7 @@ pub mod prelude;
         }
         F
     }};
-    ((defn $name:ident ($(($argn:ident $argt:ty))* -> $ret:ty) $($body:tt)*)) => {
+    ((defn $name:ident (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
         fn $name($($argn:$argt),*) -> $ret { $(lisp!($body));* }
     };
     ((_if $cond:tt $yes:tt $no:tt)) => {
