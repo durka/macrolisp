@@ -10,26 +10,26 @@ pub mod prelude;
     };
     
     // special forms
-    ((_if: $cond:tt $yes:tt $no:tt)) => {
+    ((_if $cond:tt $yes:tt $no:tt)) => {
         if lisp!($cond) { lisp!($yes) } else { lisp!($no) }
     };
-    ((_while: $cond:tt $($body:tt)*)) => {
+    ((_while $cond:tt $($body:tt)*)) => {
         while lisp!($cond) { $(lisp!($body));* }
     };
 
     // variables
-    ((_let: mut $var:ident $val:tt)) => {
+    ((_let mut $var:ident $val:tt)) => {
         let mut $var = lisp!($val);
     };
-    ((_let: $var:ident $val:tt)) => {
+    ((_let $var:ident $val:tt)) => {
         let $var = lisp!($val);
     };
-    ((_set: $var:ident $val:tt)) => {
+    ((_set $var:ident $val:tt)) => {
         $var = lisp!($val);
     };
 
     // escape hatch
-    ((_rust: $body:block)) => {
+    ((_rust $body:block)) => {
         { $body }
     };
     
