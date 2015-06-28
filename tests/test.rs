@@ -1,5 +1,5 @@
 #[macro_use] extern crate macrolisp;
-use macrolisp::*;
+use macrolisp::prelude::*;
 
 #[test]
 fn main() {
