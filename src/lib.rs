@@ -4,12 +4,13 @@
 pub mod prelude;
                   
 #[macro_export] macro_rules! lisp {
-    // lambda
+    // special forms
     ((lambda ($(($argn:ident $argt:ty))* -> $ret:ty) $($body:tt)*)) => {
         |$($argn:$argt),*| -> $ret { $(lisp!($body));* }
     };
-    
-    // special forms
+    ((defn $name:ident ($(($argn:ident $argt:ty))* -> $ret:ty) $($body:tt)*)) => {
+        fn $name($($argn:$argt),*) -> $ret { $(lisp!($body));* }
+    };
     ((_if $cond:tt $yes:tt $no:tt)) => {
         if lisp!($cond) { lisp!($yes) } else { lisp!($no) }
     };
@@ -40,10 +41,10 @@ pub mod prelude;
     
     // call function
     (__LIST__ $name:expr) => {
-        (lisp!($name))()
+        lisp!($name)()
     };
     (__LIST__ $name:expr, $($arg:tt),*) => {
-        (lisp!($name))($(lisp!($arg)),*)
+        lisp!($name)($(lisp!($arg)),*)
     };
     
     // one expression

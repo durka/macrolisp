@@ -6,11 +6,6 @@ fn main() {
     let add = lisp!(
         (lambda ((a i32) (b i32) -> i32) (_add a b))
     );
-    /*let factorial = lisp!(
-        (lambda ((a i32) -> i32) (_if: (_eq: a 1)
-                                       1
-                                       (_mul: a (_recur: (_sub: a 1)))))
-    );*/
     let factorial = lisp!(
         (lambda ((a i32) -> i32) (_let mut x a)
                                  (_let mut acc 1)
@@ -19,9 +14,14 @@ fn main() {
                                   (_set x   (_sub x 1)))
                                  acc)
     );
+    lisp!(
+        (defn factorial_rec ((a i32) -> i32) (_if (_eq a 1)
+                                                  1
+                                                  (_mul a (factorial_rec (_sub a 1)))))
+    );
     
     println!("1+2+3+4 = {}", lisp!( (add 1 (add 2 (add 3 4))) ));
     println!("5! = {}", lisp!( (factorial 5) ));
-    println!("10! = {}", lisp!( (factorial 10) ));
+    println!("10! = {}", lisp!( (factorial_rec 10) ));
 }
 
