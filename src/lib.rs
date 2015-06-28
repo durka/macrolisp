@@ -42,7 +42,7 @@ pub mod prelude;
     (__LIST__ $name:expr) => {
         (lisp!($name))()
     };
-    (__LIST__ $name:path, $($arg:tt),*) => {
+    (__LIST__ $name:expr, $($arg:tt),*) => {
         (lisp!($name))($(lisp!($arg)),*)
     };
     
