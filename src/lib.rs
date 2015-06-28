@@ -1,5 +1,6 @@
 pub mod prelude;
 
+// TODO documentation
 #[macro_export] macro_rules! lisp {
     // special forms
     ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
@@ -38,16 +39,20 @@ pub mod prelude;
     ((_while $cond:tt $($body:tt)*)) => {
         while lisp!($cond) { $(lisp!($body));* }
     };
+    // TODO for loops
     ((_match $var:tt $(($cond:tt $arm:tt))*)) => {
         match lisp!($var) {
             $(lisp!(__PAT__ $cond) => lisp!($arm)),*
         }
     };
-    ((_prn $($arg:tt)*)) => {
+    ((_prn $($arg:tt)*)) => { // TODO more general macro invocation?
         println!($(lisp!($arg)),*)
     };
 
     // variables
+    // TODO let introduces a scope
+    // TODO multiple bindings (add more parens)
+    // TODO letrec?
     ((_let mut $var:ident $val:tt)) => {
         let mut $var = lisp!($val);
     };
@@ -98,6 +103,7 @@ pub mod prelude;
                                                                   $($rest),+) };
 
     // reduce implementation
+    // TODO external entry point for _reduce
     (__REDUCE__ $op:ident, $acc:tt)                       => { lisp!($acc)                     };
     (__REDUCE__ $op:ident, $acc:tt, $a:tt)                => { lisp!(__REDUCE__ $op,
                                                                                 ($op $acc $a)) };
