@@ -14,12 +14,12 @@ pub mod prelude;
         impl FnOnce<($($argt,)*)> for F {
             type Output = $ret;
             extern "rust-call" fn call_once($s, ($($argn,)*): ($($argt,)*)) -> $ret {
-                $(lisp!($body));*
+                $s.call(($($argn,)*))
             }
         }
         impl FnMut<($($argt,)*)> for F {
             extern "rust-call" fn call_mut(&mut $s, ($($argn,)*): ($($argt,)*)) -> $ret {
-                $(lisp!($body));*
+                $s.call(($($argn,)*))
             }
         }
         impl Fn<($($argt,)*)> for F {
