@@ -69,24 +69,30 @@ pub mod prelude;
     };
     
     // operators and function calls
-    (__LIST__ +,  $a:tt, $b:tt) => { lisp!(__LIST__ _add, $a, $b) };
-    (__LIST__ &,  $a:tt, $b:tt) => { lisp!(__LIST__ _and, $a, $b) };
-    (__LIST__ |,  $a:tt, $b:tt) => { lisp!(__LIST__ _or,  $a, $b) };
-    (__LIST__ ^,  $a:tt, $b:tt) => { lisp!(__LIST__ _xor, $a, $b) };
-    (__LIST__ /,  $a:tt, $b:tt) => { lisp!(__LIST__ _div, $a, $b) };
-    (__LIST__ *,  $a:tt, $b:tt) => { lisp!(__LIST__ _mul, $a, $b) };
-    (__LIST__ %,  $a:tt, $b:tt) => { lisp!(__LIST__ _rem, $a, $b) };
-    (__LIST__ <<, $a:tt, $b:tt) => { lisp!(__LIST__ _shl, $a, $b) };
-    (__LIST__ >>, $a:tt, $b:tt) => { lisp!(__LIST__ _shr, $a, $b) };
-    (__LIST__ -,  $a:tt, $b:tt) => { lisp!(__LIST__ _sub, $a, $b) };
-    (__LIST__ -,  $a:tt       ) => { lisp!(__LIST__ _neg, $a    ) };
-    (__LIST__ !,  $a:tt       ) => { lisp!(__LIST__ _not, $a    ) };
-    (__LIST__ ==, $a:tt, $b:tt) => { lisp!(__LIST__ _eq,  $a, $b) };
-    (__LIST__ !=, $a:tt, $b:tt) => { lisp!(__LIST__ _ne,  $a, $b) };
-    (__LIST__ >,  $a:tt, $b:tt) => { lisp!(__LIST__ _gt,  $a, $b) };
-    (__LIST__ <,  $a:tt, $b:tt) => { lisp!(__LIST__ _lt,  $a, $b) };
-    (__LIST__ >=, $a:tt, $b:tt) => { lisp!(__LIST__ _ge,  $a, $b) };
-    (__LIST__ <=, $a:tt, $b:tt) => { lisp!(__LIST__ _le,  $a, $b) };
+    (__LIST__ -,    $arg:tt   ) => { lisp!(__UNARY_OP__  _neg,   $arg   ) };
+    (__LIST__ !,    $arg:tt   ) => { lisp!(__UNARY_OP__  _not,   $arg   ) };
+    (__LIST__ +,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _add, $($arg),*) };
+    (__LIST__ &,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _and, $($arg),*) };
+    (__LIST__ |,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _or,  $($arg),*) };
+    (__LIST__ ^,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _xor, $($arg),*) };
+    (__LIST__ /,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _div, $($arg),*) };
+    (__LIST__ *,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _mul, $($arg),*) };
+    (__LIST__ %,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _rem, $($arg),*) };
+    (__LIST__ <<, $($arg:tt),*) => { lisp!(__BINARY_OP__ _shl, $($arg),*) };
+    (__LIST__ >>, $($arg:tt),*) => { lisp!(__BINARY_OP__ _shr, $($arg),*) };
+    (__LIST__ -,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _sub, $($arg),*) };
+    (__LIST__ ==, $($arg:tt),*) => { lisp!(__BINARY_OP__ _eq,  $($arg),*) };
+    (__LIST__ !=, $($arg:tt),*) => { lisp!(__BINARY_OP__ _ne,  $($arg),*) };
+    (__LIST__ >,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _gt,  $($arg),*) };
+    (__LIST__ <,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _lt,  $($arg),*) };
+    (__LIST__ >=, $($arg:tt),*) => { lisp!(__BINARY_OP__ _ge,  $($arg),*) };
+    (__LIST__ <=, $($arg:tt),*) => { lisp!(__BINARY_OP__ _le,  $($arg),*) };
+
+    (__UNARY_OP__  $op:ident, $a:tt)        => { lisp!(__LIST__ $op, $a) };
+    (__BINARY_OP__ $op:ident, $a:tt, $b:tt) => { lisp!(__LIST__ $op, $a, $b) };
+    (__BINARY_OP__ $op:ident, $a:tt, $b:tt, $($rest:tt),+) =>
+                                               { $op(lisp!($a),
+                                                     lisp!(__BINARY_OP__ $op, $b, $($rest),+)) };
     (__LIST__ $name:expr) => {
         lisp!($name)()
     };

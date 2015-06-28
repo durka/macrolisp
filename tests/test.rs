@@ -6,11 +6,13 @@ use macrolisp::prelude::*;
 
 #[test]
 fn main() {
-    let add = lisp!(
+    let add4 = lisp!(
         (lambda (((a i32)
-                  (b i32))
+                  (b i32)
+                  (c i32)
+                  (d i32))
                  i32)
-         (+ a b))
+         (+ a b c d))
     );
     let factorial_proc = lisp!(
         (lambda (((a i32))
@@ -46,7 +48,8 @@ fn main() {
                 (self (- n 2))))))
     );
     
-    println!("1+2+3+4 = {}", lisp!( (add 1 (add 2 (add 3 4))) ));
+    println!("1+2+3+4 = {}", lisp!( (add4 1 2 3 4) ));
+    println!("1-2-3-4 = {}", lisp!( (- 1 2 3 4) ));
     println!("5! = {}", lisp!( (factorial_proc 5) ));
     println!("6! = {}", lisp!( (factorial 6) ));
     println!("-(7!) = {}", lisp!( (- (factorial_rec 7)) ));
