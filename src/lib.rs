@@ -38,9 +38,14 @@ pub mod prelude;
     ((_while $cond:tt $($body:tt)*)) => {
         while lisp!($cond) { $(lisp!($body));* }
     };
-    /*((_recur $($arg:tt)*)) => {
-        self.call($(lisp!($arg)),*)
-    };*/
+    ((_match $var:tt $(($cond:tt $arm:tt))*)) => {
+        match lisp!($var) {
+            $(lisp!(__PAT__ $cond) => lisp!($arm)),*
+        }
+    };
+    ((_prn $($arg:tt)*)) => {
+        println!($(lisp!($arg)),*)
+    };
 
     // variables
     ((_let mut $var:ident $val:tt)) => {
@@ -70,9 +75,10 @@ pub mod prelude;
     (__LIST__ $name:expr, $($arg:tt),*) => {
         lisp!($name)($(lisp!($arg)),*)
     };
-    
+
     // one expression
     ($e:expr) => ($e);
+    (__PAT__ $p:pat) => ($p);
     
     // empty
     () => (());
