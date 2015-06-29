@@ -16,7 +16,7 @@ A Lispy syntax for Rust.
 
 See the [tests](tests/test.rs) for full usage examples.
 
-To use MacroLisp, import the crate with the `#[macro_use]` attribute. You'll also want to bring in the prelude to get operators and other goodies:
+To use MacroLisp, import the crate with the `#[macro_use]` attribute. You'll also want to bring in the prelude to get operators:
 
 ```rust
 #[macro_use] extern crate macrolisp;
@@ -25,7 +25,7 @@ use macrolisp::prelude::*;
 
 All the public symbols in the prelude begin with an underscore, so conflicts should be minimal.
 
-Some features in MacroLisp require experimental support from the compiler. If you want to use these features, you'll need to use a nightly rustc and turn on some features in your crate. This tables summarizes the requirements:
+Some features in MacroLisp require experimental support from the compiler. If you want to use these features, you'll need to use a nightly rustc and turn on some features in your crate. This table summarizes the requirements:
 
 MacroLisp feature | Rust feature
 ------------------|-------------
