@@ -17,12 +17,12 @@ fn main() {
     let factorial_proc = lisp!(
         (lambda (((a i32))
                  i32)
-         (_let mut x a)
-         (_let mut acc 1)
-         (_while (> x 1)
-          (_set acc (* acc x))
-          (_set x   (- x 1)))
-         acc)
+         (_let ((mut x   a)
+                (mut acc 1))
+          (_while (> x 1)
+           (_set acc (* acc x))
+           (_set x   (- x 1)))
+          acc))
     );
     lisp!(
         (defn factorial (((a i32))

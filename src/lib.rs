@@ -1,6 +1,7 @@
 pub mod prelude;
 
 // TODO documentation
+// TODO MACROS
 #[macro_export] macro_rules! lisp {
     // special forms
     ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
@@ -47,15 +48,25 @@ pub mod prelude;
     };
 
     // variables
-    // TODO let introduces a scope
-    // TODO multiple bindings (add more parens)
-    // TODO letrec?
-    ((_let mut $var:ident $val:tt)) => {
+    ((_let ((mut $var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
         let mut $var = lisp!($val);
-    };
-    ((_let $var:ident $val:tt)) => {
+        lisp!((_let ($($bindings)+) $($body)*))
+    }};
+    ((_let (($var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
         let $var = lisp!($val);
-    };
+        lisp!((_let ($($bindings)+) $($body)*))
+    }};
+    ((_let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
+        let mut $var = lisp!($val);
+        $(lisp!($body));*
+    }};
+    ((_let (($var:ident $val:tt)) $($body:tt)*)) => {{
+        let $var = lisp!($val);
+        $(lisp!($body));*
+    }};
+    // (let ((a 1)
+    //       ((mut b) 2))
+    //   body)
     ((_set $var:ident $val:tt)) => {
         $var = lisp!($val);
     };
