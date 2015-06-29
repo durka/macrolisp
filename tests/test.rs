@@ -60,16 +60,16 @@ fn nightly_tests() {
 
     println!("-(7!) = {}", lisp!( (- (factorial_rec 7)) ));
     lisp!(
-        (_prn "fib = {} {} {} {} {} {} {} {} {} {} ..." (fib 0)
-                                                        (fib 1)
-                                                        (fib 2)
-                                                        (fib 3)
-                                                        (fib 4)
-                                                        (fib 5)
-                                                        (fib 6)
-                                                        (fib 7)
-                                                        (fib 8)
-                                                        (fib 9))
+        (println! "fib = {} {} {} {} {} {} {} {} {} {} ..." (fib 0)
+                                                            (fib 1)
+                                                            (fib 2)
+                                                            (fib 3)
+                                                            (fib 4)
+                                                            (fib 5)
+                                                            (fib 6)
+                                                            (fib 7)
+                                                            (fib 8)
+                                                            (fib 9))
     );
 }
 

@@ -45,9 +45,6 @@ pub mod prelude;
             $(lisp!(__PAT__ $cond) => lisp!($arm)),*
         }
     };
-    ((_prn $($arg:tt)*)) => { // TODO more general macro invocation?
-        println!($(lisp!($arg)),*)
-    };
 
     // variables
     // TODO let introduces a scope
@@ -110,6 +107,11 @@ pub mod prelude;
     (__REDUCE__ $op:ident, $acc:tt, $a:tt, $($rest:tt),+) => { lisp!(__REDUCE__ $op,
                                                                                 ($op $acc $a),
                                                                                 $($rest),+)    };
+
+    // macro calls
+    (__LIST__ $mac:ident, !, $($arg:tt),*) => {
+        $mac!($(lisp!($arg)),*)
+    };
 
     // function calls
     (__LIST__ $name:expr) => {
