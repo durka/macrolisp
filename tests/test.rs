@@ -86,3 +86,32 @@ fn nightly_tests() {
     );
 }
 
+#[test]
+fn regular_lambda_tests() {
+    let mut num = 5;
+    lisp!(
+        (_let ((mut add_num (lambda (((x i32))
+                                     ())
+                             (_set num (+ num x)))))
+         (add_num 5))
+    );
+    println!("num = {}", num);
+}
+
+#[cfg(feature = "nightly")]
+#[test]
+fn recursive_lambda_tests() {
+    let mut num = 5;
+    lisp!(
+        (_let ((mut add_num (lambda self (((x i32))
+                                          ())
+                             (_if (> x 0)
+                              (_do
+                               (_set num (+ num 1))
+                               (self (- x 1)))
+                              ()))))
+         (add_num 5))
+    );
+    println!("num = {}", num);
+}
+

@@ -12,6 +12,7 @@ pub mod prelude;
         // recursive lambda
         // $s MUST be "self"
         // recurse by calling (self ...)
+        // FIXME recursive lambdas can't capture variables
         struct F;
         impl FnOnce<($($argt,)*)> for F {
             type Output = $ret;
@@ -46,6 +47,9 @@ pub mod prelude;
             $(lisp!(__PAT__ $cond) => lisp!($arm)),*
         }
     };
+    ((_do $($stmts:tt)*)) => {{
+        $(lisp!($stmts));*
+    }};
 
     // variables
     ((_let ((mut $var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
