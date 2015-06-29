@@ -64,9 +64,6 @@ pub mod prelude;
         let $var = lisp!($val);
         $(lisp!($body));*
     }};
-    // (let ((a 1)
-    //       ((mut b) 2))
-    //   body)
     ((_set $var:ident $val:tt)) => {
         $var = lisp!($val);
     };
@@ -120,6 +117,9 @@ pub mod prelude;
                                                                                 $($rest),+)    };
 
     // macro calls
+    (__LIST__ $mac:ident, !) => {
+        $mac!()
+    };
     (__LIST__ $mac:ident, !, $($arg:tt),*) => {
         $mac!($(lisp!($arg)),*)
     };
