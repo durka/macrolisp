@@ -32,10 +32,23 @@ fn main() {
               (* a (factorial (- a 1)))))
     );
 
+    lisp!(
+        (defn factorial_tail (((a i32))
+                              i32)
+         (defn factorial_tail_helper (((a i32)
+                                       (acc i32))
+                                      i32)
+          (_if (== a 1)
+               acc
+               (factorial_tail_helper (- a 1) (* acc a))))
+         (factorial_tail_helper a 1))
+    );
+
     println!("1+2+3+4 = {}", lisp!( (add4 1 2 3 4) )); // TODO example with heterogeneous types
     println!("1-2-3-4 = {}", lisp!( (- 1 2 3 4) ));
     println!("5! = {}", lisp!( (factorial_proc 5) ));
     println!("6! = {}", lisp!( (factorial 6) ));
+    println!("7! = {}", lisp!( (factorial_tail 7) ));
 }
 
 #[cfg(feature = "nightly")]
@@ -58,7 +71,7 @@ fn nightly_tests() {
                 (self (- n 2))))))
     );
 
-    println!("-(7!) = {}", lisp!( (- (factorial_rec 7)) ));
+    println!("-(8!) = {}", lisp!( (- (factorial_rec 8)) ));
     lisp!(
         (println! "fib = {} {} {} {} {} {} {} {} {} {} ..." (fib 0)
                                                             (fib 1)
