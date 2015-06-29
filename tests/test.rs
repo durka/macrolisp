@@ -1,5 +1,5 @@
-#![feature(core, unboxed_closures, trace_macros)]
-trace_macros!(true);
+#![cfg_attr(feature = "nightly", feature(core, unboxed_closures, trace_macros))]
+#[cfg(feature = "nightly")] trace_macros!(true);
 
 #[macro_use] extern crate macrolisp;
 use macrolisp::prelude::*;
@@ -31,6 +31,16 @@ fn main() {
               1
               (* a (factorial (- a 1)))))
     );
+
+    println!("1+2+3+4 = {}", lisp!( (add4 1 2 3 4) )); // TODO example with heterogeneous types
+    println!("1-2-3-4 = {}", lisp!( (- 1 2 3 4) ));
+    println!("5! = {}", lisp!( (factorial_proc 5) ));
+    println!("6! = {}", lisp!( (factorial 6) ));
+}
+
+#[cfg(feature = "nightly")]
+#[test]
+fn nightly_tests() {
     let factorial_rec = lisp!(
         (lambda self (((a i32))
                       i32)
@@ -47,11 +57,7 @@ fn main() {
           (n (+ (self (- n 1))
                 (self (- n 2))))))
     );
-    
-    println!("1+2+3+4 = {}", lisp!( (add4 1 2 3 4) )); // TODO example with heterogeneous types
-    println!("1-2-3-4 = {}", lisp!( (- 1 2 3 4) ));
-    println!("5! = {}", lisp!( (factorial_proc 5) ));
-    println!("6! = {}", lisp!( (factorial 6) ));
+
     println!("-(7!) = {}", lisp!( (- (factorial_rec 7)) ));
     lisp!(
         (_prn "fib = {} {} {} {} {} {} {} {} {} {} ..." (fib 0)
