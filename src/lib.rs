@@ -18,54 +18,54 @@ pub mod prelude;
         // recurse by calling ($s ...)
         // FIXME recursive lambdas can't capture variables
         
-        lisp!((_rust { fn $s($($argn: $argt),*) -> $ret { $(lisp!($body));* } $s }))
+        lisp!((rust { fn $s($($argn: $argt),*) -> $ret { $(lisp!($body));* } $s }))
     }};
     ((defn $name:ident (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
         fn $name($($argn:$argt),*) -> $ret { $(lisp!($body));* }
     };
-    ((_if $cond:tt $yes:tt $no:tt)) => {
+    ((if $cond:tt $yes:tt $no:tt)) => {
         if lisp!($cond) { lisp!($yes) } else { lisp!($no) }
     };
-    ((_while $cond:tt $($body:tt)*)) => { // FIXME just one body tt, or move down to __LIST__ section to compile on stable
+    ((while $cond:tt $($body:tt)*)) => { // FIXME just one body tt, or move down to __LIST__ section to compile on stable
         while lisp!($cond) { $(lisp!($body));* }
     };
     // TODO for loops
-    ((_match $var:tt $(($cond:tt $arm:tt))*)) => {
+    ((match $var:tt $(($cond:tt $arm:tt))*)) => {
         match lisp!($var) {
             $(lisp!(__PAT__ $cond) => lisp!($arm)),*
         }
     };
-    ((_do $($stmts:tt)*)) => {{ // FIXME is this necessary? (_let () ...) is the same
+    ((do $($stmts:tt)*)) => {{ // FIXME is this necessary? (let () ...) is the same
         $(lisp!($stmts));*
     }};
 
     // variables
-    ((_let ((mut $var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
+    ((let ((mut $var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
         let mut $var = lisp!($val);
-        lisp!((_let ($($bindings)+) $($body)*))
+        lisp!((let ($($bindings)+) $($body)*))
     }};
-    ((_let (($var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
+    ((let (($var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
         let $var = lisp!($val);
-        lisp!((_let ($($bindings)+) $($body)*))
+        lisp!((let ($($bindings)+) $($body)*))
     }};
-    ((_let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
+    ((let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
         let mut $var = lisp!($val);
         $(lisp!($body));*
     }};
-    ((_let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
+    ((let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
         let mut $var = lisp!($val);
         $(lisp!($body));*
     }};
-    ((_let (($var:ident $val:tt)) $($body:tt)*)) => {{
+    ((let (($var:ident $val:tt)) $($body:tt)*)) => {{
         let $var = lisp!($val);
         $(lisp!($body));*
     }};
-    ((_set $var:ident $val:tt)) => {
+    ((:= $var:ident $val:tt)) => {
         $var = lisp!($val);
     };
 
     // escape hatch
-    ((_rust $body:block)) => {
+    ((rust $body:block)) => {
         { $body }
     };
 

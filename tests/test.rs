@@ -16,19 +16,19 @@ fn main() {
     let factorial_proc = lisp!(
         (lambda (((a i32))
                  i32)
-         (_let ((mut x   a)
+         (let ((mut x   a)
                 (mut acc 1))
-          (_while (> x 1)
-           (_set acc (* acc x))
-           (_set x   (- x 1)))
+          (while (> x 1)
+           (:= acc (* acc x))
+           (:= x   (- x 1)))
           acc))
     );
     lisp!(
         (defn factorial (((a i32))
                          i32)
-         (_if (== a 1)
-              1
-              (* a (factorial (- a 1)))))
+         (if (== a 1)
+             1
+             (* a (factorial (- a 1)))))
     );
 
     lisp!(
@@ -37,9 +37,9 @@ fn main() {
          (defn factorial_tail_helper (((a i32)
                                        (acc i32))
                                       i32)
-          (_if (== a 1)
-               acc
-               (factorial_tail_helper (- a 1) (* acc a))))
+          (if (== a 1)
+              acc
+              (factorial_tail_helper (- a 1) (* acc a))))
          (factorial_tail_helper a 1))
     );
 
@@ -56,14 +56,14 @@ fn nightly_tests() {
     let factorial_rec = lisp!(
         (lambda rec (((a i32))
                       i32)
-         (_if (== a 1)
-              1
-              (* a (rec (- a 1)))))
+         (if (== a 1)
+             1
+             (* a (rec (- a 1)))))
     );
     let fib = lisp!(
         (lambda rec (((a i32))
                       i32)
-         (_match a
+         (match a
           (0 1)
           (1 1)
           (n (+ (rec (- n 1))
@@ -89,9 +89,9 @@ fn nightly_tests() {
 fn lambda_tests() {
     let mut num = 5;
     lisp!(
-        (_let ((mut add_num (lambda (((x i32))
+        (let ((mut add_num (lambda (((x i32))
                                      ())
-                             (_set num (+ num x)))))
+                             (:= num (+ num x)))))
          (add_num 5))
     );
     println!("num = {}", num);
