@@ -1,5 +1,4 @@
-#![cfg_attr(feature = "nightly", feature(core, unboxed_closures, trace_macros))]
-#[cfg(feature = "nightly")] trace_macros!(true);
+#![cfg_attr(feature = "nightly", feature(unboxed_closures, trace_macros))]
 
 #[macro_use] extern crate macrolisp;
 use macrolisp::prelude::*;
@@ -55,20 +54,20 @@ fn main() {
 #[test]
 fn nightly_tests() {
     let factorial_rec = lisp!(
-        (lambda self (((a i32))
+        (lambda rec (((a i32))
                       i32)
          (_if (== a 1)
               1
-              (* a (self (- a 1)))))
+              (* a (rec (- a 1)))))
     );
     let fib = lisp!(
-        (lambda self (((a i32))
+        (lambda rec (((a i32))
                       i32)
          (_match a
           (0 1)
           (1 1)
-          (n (+ (self (- n 1))
-                (self (- n 2))))))
+          (n (+ (rec (- n 1))
+                (rec (- n 2))))))
     );
 
     println!("-(8!) = {}", lisp!( (- (factorial_rec 8)) ));
@@ -87,29 +86,12 @@ fn nightly_tests() {
 }
 
 #[test]
-fn regular_lambda_tests() {
+fn lambda_tests() {
     let mut num = 5;
     lisp!(
         (_let ((mut add_num (lambda (((x i32))
                                      ())
                              (_set num (+ num x)))))
-         (add_num 5))
-    );
-    println!("num = {}", num);
-}
-
-#[cfg(feature = "nightly")]
-#[test]
-fn recursive_lambda_tests() {
-    let mut num = 5;
-    lisp!(
-        (_let ((mut add_num (lambda self (((x i32))
-                                          ())
-                             (_if (> x 0)
-                              (_do
-                               (_set num (+ num 1))
-                               (self (- x 1)))
-                              ()))))
          (add_num 5))
     );
     println!("num = {}", num);

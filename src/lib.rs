@@ -3,6 +3,10 @@ pub mod prelude;
 // TODO documentation
 // TODO MACROS
 #[macro_export] macro_rules! lisp {
+    // empty
+    () => (());
+    (()) => (());
+
     // special forms
     ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
         // regular lambda
@@ -10,27 +14,11 @@ pub mod prelude;
     };
     ((lambda $s:ident (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {{
         // recursive lambda
-        // $s MUST be "self"
-        // recurse by calling (self ...)
+        // $s MUST NOT be "self"
+        // recurse by calling ($s ...)
         // FIXME recursive lambdas can't capture variables
-        struct F;
-        impl FnOnce<($($argt,)*)> for F {
-            type Output = $ret;
-            extern "rust-call" fn call_once($s, ($($argn,)*): ($($argt,)*)) -> $ret {
-                $s.call(($($argn,)*))
-            }
-        }
-        impl FnMut<($($argt,)*)> for F {
-            extern "rust-call" fn call_mut(&mut $s, ($($argn,)*): ($($argt,)*)) -> $ret {
-                $s.call(($($argn,)*))
-            }
-        }
-        impl Fn<($($argt,)*)> for F {
-            extern "rust-call" fn call(&$s, ($($argn,)*): ($($argt,)*)) -> $ret {
-                $(lisp!($body));*
-            }
-        }
-        F
+        
+        lisp!((_rust { fn $s($($argn: $argt),*) -> $ret { $(lisp!($body));* } $s }))
     }};
     ((defn $name:ident (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
         fn $name($($argn:$argt),*) -> $ret { $(lisp!($body));* }
@@ -38,7 +26,7 @@ pub mod prelude;
     ((_if $cond:tt $yes:tt $no:tt)) => {
         if lisp!($cond) { lisp!($yes) } else { lisp!($no) }
     };
-    ((_while $cond:tt $($body:tt)*)) => {
+    ((_while $cond:tt $($body:tt)*)) => { // FIXME just one body tt, or move down to __LIST__ section to compile on stable
         while lisp!($cond) { $(lisp!($body));* }
     };
     // TODO for loops
@@ -47,7 +35,7 @@ pub mod prelude;
             $(lisp!(__PAT__ $cond) => lisp!($arm)),*
         }
     };
-    ((_do $($stmts:tt)*)) => {{
+    ((_do $($stmts:tt)*)) => {{ // FIXME is this necessary? (_let () ...) is the same
         $(lisp!($stmts));*
     }};
 
@@ -59,6 +47,10 @@ pub mod prelude;
     ((_let (($var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
         let $var = lisp!($val);
         lisp!((_let ($($bindings)+) $($body)*))
+    }};
+    ((_let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
+        let mut $var = lisp!($val);
+        $(lisp!($body));*
     }};
     ((_let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
         let mut $var = lisp!($val);
@@ -139,8 +131,5 @@ pub mod prelude;
     // one expression
     ($e:expr) => ($e);
     (__PAT__ $p:pat) => ($p);
-    
-    // empty
-    () => (());
 }
 
