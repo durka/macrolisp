@@ -1,4 +1,4 @@
-#![cfg_attr(feature = "nightly", feature(unboxed_closures, trace_macros))]
+#![cfg_attr(feature = "nightly", feature(unboxed_closures, custom_attribute))]
 
 #[macro_use] extern crate macrolisp;
 use macrolisp::prelude::*;
@@ -96,4 +96,24 @@ fn lambda_tests() {
     );
     println!("num = {}", num);
 }
+
+/* rust-lang/rust#12335
+
+#[cfg(feature = "nightly")]
+#[test] #[compile_fail]
+fn lambdarec_cannot_capture() {
+    let mut num = 5;
+    lisp!(
+        (let ((mut add_num (lambda rec (((x i32))
+                                        ())
+                            (if (> x 0)
+                             (do
+                              (:= num (+ num 1))
+                              (rec (- x 1)))
+                             ()))))
+         (add_num 5))
+    );
+    println!("num = {}", num);
+}
+*/
 
