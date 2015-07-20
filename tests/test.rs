@@ -8,6 +8,7 @@ macro_rules! ck {
     }}
 }
 
+
 #[test]
 fn main() {
     let add4 = lisp!(
@@ -48,11 +49,22 @@ fn main() {
          (factorial_tail_helper a 1))
     );
 
-    println!("1+2+3+4 = {}", ck!(lisp!( (add4 1 2 3 4)     ), 10)); // TODO example with heterogeneous types
-    println!("1-2-3-4 = {}", ck!(lisp!( (- 1 2 3 4)        ), -8));
-    println!("5! = {}",      ck!(lisp!( (factorial_proc 5) ), 120));
-    println!("6! = {}",      ck!(lisp!( (factorial 6)      ), 720));
-    println!("7! = {}",      ck!(lisp!( (factorial_tail 7) ), 5040));
+    struct IntegralFloat { i: i32 }
+    impl std::ops::Add for IntegralFloat {
+        type Output = f32;
+        fn add(self, rhs: Self) -> Self::Output {
+            self.i as Self::Output + rhs.i as Self::Output
+        }
+    }
+
+    println!("1+2+3+4 = {}",  ck!(lisp!( (add4 1 2 3 4)     ),                10));
+    println!("1+2+3.0 = {}", ck!(lisp!( (+ (rust { IntegralFloat { i: 1 } })
+                                           (rust { IntegralFloat { i: 2 } })
+                                           3.0) ),                            6.0));
+    println!("1-2-3-4 = {}",  ck!(lisp!( (- 1 2 3 4)        ),                -8));
+    println!("5! = {}",       ck!(lisp!( (factorial_proc 5) ),                120));
+    println!("6! = {}",       ck!(lisp!( (factorial 6)      ),                720));
+    println!("7! = {}",       ck!(lisp!( (factorial_tail 7) ),                5040));
 }
 
 #[test]
