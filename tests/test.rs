@@ -58,9 +58,9 @@ fn main() {
     }
 
     println!("1+2+3+4 = {}",  ck!(lisp!( (add4 1 2 3 4)     ),                10));
-    println!("1+2+3.0 = {}", ck!(lisp!( (+ (rust { IntegralFloat { i: 1 } })
-                                           (rust { IntegralFloat { i: 2 } })
-                                           3.0) ),                            6.0));
+    println!("1+2+3.0 = {}",  ck!(lisp!( (+ (rust { IntegralFloat { i: 1 } })
+                                            (rust { IntegralFloat { i: 2 } })
+                                            3.0) ),                           6.0));
     println!("1-2-3-4 = {}",  ck!(lisp!( (- 1 2 3 4)        ),                -8));
     println!("5! = {}",       ck!(lisp!( (factorial_proc 5) ),                120));
     println!("6! = {}",       ck!(lisp!( (factorial 6)      ),                720));
