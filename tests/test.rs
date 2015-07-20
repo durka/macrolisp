@@ -1,6 +1,13 @@
 #[macro_use] extern crate macrolisp;
 use macrolisp::prelude::*;
 
+macro_rules! ck {
+    ($left:expr, $right:expr) => {{
+        assert_eq!($left, $right);
+        $left
+    }}
+}
+
 #[test]
 fn main() {
     let add4 = lisp!(
@@ -41,11 +48,11 @@ fn main() {
          (factorial_tail_helper a 1))
     );
 
-    println!("1+2+3+4 = {}", lisp!( (add4 1 2 3 4) )); // TODO example with heterogeneous types
-    println!("1-2-3-4 = {}", lisp!( (- 1 2 3 4) ));
-    println!("5! = {}", lisp!( (factorial_proc 5) ));
-    println!("6! = {}", lisp!( (factorial 6) ));
-    println!("7! = {}", lisp!( (factorial_tail 7) ));
+    println!("1+2+3+4 = {}", ck!(lisp!( (add4 1 2 3 4)     ), 10)); // TODO example with heterogeneous types
+    println!("1-2-3-4 = {}", ck!(lisp!( (- 1 2 3 4)        ), -8));
+    println!("5! = {}",      ck!(lisp!( (factorial_proc 5) ), 120));
+    println!("6! = {}",      ck!(lisp!( (factorial 6)      ), 720));
+    println!("7! = {}",      ck!(lisp!( (factorial_tail 7) ), 5040));
 }
 
 #[test]
@@ -67,18 +74,18 @@ fn lambdarec_tests() {
                 (rec (- n 2))))))
     );
 
-    println!("-(8!) = {}", lisp!( (- (factorial_rec 8)) ));
+    println!("-(8!) = {}", ck!(lisp!( (- (factorial_rec 8)) ), -40320));
     lisp!(
-        (println! "fib = {} {} {} {} {} {} {} {} {} {} ..." (fib 0)
-                                                            (fib 1)
-                                                            (fib 2)
-                                                            (fib 3)
-                                                            (fib 4)
-                                                            (fib 5)
-                                                            (fib 6)
-                                                            (fib 7)
-                                                            (fib 8)
-                                                            (fib 9))
+        (println! "fib = {} {} {} {} {} {} {} {} {} {} ..." (ck! (fib 0) 1)
+                                                            (ck! (fib 1) 1)
+                                                            (ck! (fib 2) 2)
+                                                            (ck! (fib 3) 3)
+                                                            (ck! (fib 4) 5)
+                                                            (ck! (fib 5) 8)
+                                                            (ck! (fib 6) 13)
+                                                            (ck! (fib 7) 21)
+                                                            (ck! (fib 8) 34)
+                                                            (ck! (fib 9) 55))
     );
 }
 
@@ -91,7 +98,7 @@ fn lambda_tests() {
                              (:= num (+ num x)))))
          (add_num 5))
     );
-    println!("num = {}", num);
+    println!("num = {}", ck!(num, 10));
 }
 
 /* rust-lang/rust#12335
@@ -109,7 +116,7 @@ fn lambdarec_cannot_capture() {
                              ()))))
          (add_num 5))
     );
-    println!("num = {}", num);
+    println!("num = {}", ck!(num, 10));
 }
 */
 
