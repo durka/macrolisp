@@ -26,16 +26,16 @@ pub mod prelude;
     ((if $cond:tt $yes:tt $no:tt)) => {
         if lisp!($cond) { lisp!($yes) } else { lisp!($no) }
     };
-    ((while $cond:tt $($body:tt)*)) => { // FIXME just one body tt, or move down to __LIST__ section to compile on stable
+    (__LIST__ while, $cond:tt, $($body:tt),*) => {
         while lisp!($cond) { $(lisp!($body));* }
     };
     // TODO for loops
-    ((match $var:tt $(($cond:tt $arm:tt))*)) => {
+    (__LIST__ match, $var:tt, $(($cond:tt $arm:tt)),*) => {
         match lisp!($var) {
             $(lisp!(__PAT__ $cond) => lisp!($arm)),*
         }
     };
-    ((do $($stmts:tt)*)) => {{ // FIXME is this necessary? (let () ...) is the same
+    ((do $($stmts:tt)*)) => {{
         $(lisp!($stmts));*
     }};
 
