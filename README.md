@@ -1,5 +1,7 @@
 # MacroLisp
 
+![Travis CI](https://travis-ci.org/durka/macrolisp.svg)
+
 ## What?
 
 A Lispy syntax for Rust.
