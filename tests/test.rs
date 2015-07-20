@@ -23,7 +23,7 @@ fn main() {
         (lambda (((a i32))
                  i32)
          (let ((mut x   a)
-                (mut acc 1))
+               (mut acc 1))
           (while (> x 1)
            (:= acc (* acc x))
            (:= x   (- x 1)))
