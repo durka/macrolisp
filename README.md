@@ -1,6 +1,6 @@
 # MacroLisp
 
-![Travis CI](https://travis-ci.org/durka/macrolisp.svg)
+[![Travis CI](https://travis-ci.org/durka/macrolisp.svg)](https://travis-ci.org/durka/macrolisp)
 
 ## What?
 
