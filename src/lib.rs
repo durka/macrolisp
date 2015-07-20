@@ -120,6 +120,11 @@ pub mod prelude;
         $mac!($(lisp!($arg)),*)
     };
 
+    // struct constructors
+    (__LIST__ $name:ident, ., $(($member:ident $val:tt)),*) => {
+        $name { $($member: lisp!($val))* }
+    };
+
     // function calls
     (__LIST__ $name:expr) => {
         lisp!($name)()
