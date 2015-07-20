@@ -1,5 +1,3 @@
-#![cfg_attr(feature = "nightly", feature(unboxed_closures, custom_attribute))]
-
 #[macro_use] extern crate macrolisp;
 use macrolisp::prelude::*;
 
@@ -50,9 +48,8 @@ fn main() {
     println!("7! = {}", lisp!( (factorial_tail 7) ));
 }
 
-#[cfg(feature = "nightly")]
 #[test]
-fn nightly_tests() {
+fn lambdarec_tests() {
     let factorial_rec = lisp!(
         (lambda rec (((a i32))
                       i32)
@@ -99,7 +96,6 @@ fn lambda_tests() {
 
 /* rust-lang/rust#12335
 
-#[cfg(feature = "nightly")]
 #[test] #[compile_fail]
 fn lambdarec_cannot_capture() {
     let mut num = 5;
