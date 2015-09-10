@@ -7,6 +7,9 @@ pub mod prelude;
     () => (());
     (()) => (());
 
+    // patterns are special snowflakes
+    (@pat $p:pat) => ($p);
+
     // special forms
     ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
         // regular lambda
@@ -26,13 +29,13 @@ pub mod prelude;
     ((if $cond:tt $yes:tt $no:tt)) => {
         if lisp!($cond) { lisp!($yes) } else { lisp!($no) }
     };
-    (__LIST__ while, $cond:tt, $($body:tt),*) => {
+    (@list while, $cond:tt, $($body:tt),*) => {
         while lisp!($cond) { $(lisp!($body));* }
     };
     // TODO for loops
-    (__LIST__ match, $var:tt, $(($cond:tt $arm:tt)),*) => {
+    (@list match, $var:tt, $(($cond:tt $arm:tt)),*) => {
         match lisp!($var) {
-            $(lisp!(__PAT__ $cond) => lisp!($arm)),*
+            $(lisp!(@pat $cond) => lisp!($arm)),*
         }
     };
     ((do $($stmts:tt)*)) => {{
@@ -71,69 +74,68 @@ pub mod prelude;
 
     // list parsing
     (($($elem:tt)*)) => {
-        lisp!(__LIST__ $($elem),*)
+        lisp!(@list $($elem),*)
     };
 
     // parsers for unary and binary operators
-    (__LIST__ -,    $arg:tt   ) => { lisp!(__UNARY_OP__  _neg,   $arg   ) };
-    (__LIST__ !,    $arg:tt   ) => { lisp!(__UNARY_OP__  _not,   $arg   ) };
-    (__LIST__ +,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _add, $($arg),*) };
-    (__LIST__ &,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _and, $($arg),*) };
-    (__LIST__ |,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _or,  $($arg),*) };
-    (__LIST__ ^,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _xor, $($arg),*) };
-    (__LIST__ /,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _div, $($arg),*) };
-    (__LIST__ *,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _mul, $($arg),*) };
-    (__LIST__ %,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _rem, $($arg),*) };
-    (__LIST__ <<, $($arg:tt),*) => { lisp!(__BINARY_OP__ _shl, $($arg),*) };
-    (__LIST__ >>, $($arg:tt),*) => { lisp!(__BINARY_OP__ _shr, $($arg),*) };
-    (__LIST__ -,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _sub, $($arg),*) };
-    (__LIST__ ==, $($arg:tt),*) => { lisp!(__BINARY_OP__ _eq,  $($arg),*) };
-    (__LIST__ !=, $($arg:tt),*) => { lisp!(__BINARY_OP__ _ne,  $($arg),*) };
-    (__LIST__ >,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _gt,  $($arg),*) };
-    (__LIST__ <,  $($arg:tt),*) => { lisp!(__BINARY_OP__ _lt,  $($arg),*) };
-    (__LIST__ >=, $($arg:tt),*) => { lisp!(__BINARY_OP__ _ge,  $($arg),*) };
-    (__LIST__ <=, $($arg:tt),*) => { lisp!(__BINARY_OP__ _le,  $($arg),*) };
+    (@list -,    $arg:tt   ) => { lisp!(@unary  _neg,   $arg   ) };
+    (@list !,    $arg:tt   ) => { lisp!(@unary  _not,   $arg   ) };
+    (@list +,  $($arg:tt),*) => { lisp!(@binary _add, $($arg),*) };
+    (@list &,  $($arg:tt),*) => { lisp!(@binary _and, $($arg),*) };
+    (@list |,  $($arg:tt),*) => { lisp!(@binary _or,  $($arg),*) };
+    (@list ^,  $($arg:tt),*) => { lisp!(@binary _xor, $($arg),*) };
+    (@list /,  $($arg:tt),*) => { lisp!(@binary _div, $($arg),*) };
+    (@list *,  $($arg:tt),*) => { lisp!(@binary _mul, $($arg),*) };
+    (@list %,  $($arg:tt),*) => { lisp!(@binary _rem, $($arg),*) };
+    (@list <<, $($arg:tt),*) => { lisp!(@binary _shl, $($arg),*) };
+    (@list >>, $($arg:tt),*) => { lisp!(@binary _shr, $($arg),*) };
+    (@list -,  $($arg:tt),*) => { lisp!(@binary _sub, $($arg),*) };
+    (@list ==, $($arg:tt),*) => { lisp!(@binary _eq,  $($arg),*) };
+    (@list !=, $($arg:tt),*) => { lisp!(@binary _ne,  $($arg),*) };
+    (@list >,  $($arg:tt),*) => { lisp!(@binary _gt,  $($arg),*) };
+    (@list <,  $($arg:tt),*) => { lisp!(@binary _lt,  $($arg),*) };
+    (@list >=, $($arg:tt),*) => { lisp!(@binary _ge,  $($arg),*) };
+    (@list <=, $($arg:tt),*) => { lisp!(@binary _le,  $($arg),*) };
 
     // generically turn unary/binary operators into function calls
-    // binary operators can be used as n-ary operators through __REDUCE__
-    (__UNARY_OP__  $op:ident, $a:tt)        => { lisp!(__LIST__ $op, $a)      };
-    (__BINARY_OP__ $op:ident, $a:tt, $b:tt) => { lisp!(__LIST__ $op, $a, $b)  };
-    (__BINARY_OP__ $op:ident, $a:tt, $b:tt, $($rest:tt),+) =>
-                                               { lisp!(__REDUCE__ $op,
-                                                                  ($op $a $b),
-                                                                  $($rest),+) };
+    // binary operators can be used as n-ary operators through @reduce
+    (@unary  $op:ident, $a:tt)        => { lisp!(@list $op, $a)     };
+    (@binary $op:ident, $a:tt, $b:tt) => { lisp!(@list $op, $a, $b) };
+    (@binary $op:ident, $a:tt, $b:tt, $($rest:tt),+) =>
+                                               { lisp!(@reduce $op,
+                                                       ($op $a $b),
+                                                       $($rest),+) };
 
     // reduce implementation
-    // TODO external entry point for _reduce
-    (__REDUCE__ $op:ident, $acc:tt)                       => { lisp!($acc)                     };
-    (__REDUCE__ $op:ident, $acc:tt, $a:tt)                => { lisp!(__REDUCE__ $op,
-                                                                                ($op $acc $a)) };
-    (__REDUCE__ $op:ident, $acc:tt, $a:tt, $($rest:tt),+) => { lisp!(__REDUCE__ $op,
-                                                                                ($op $acc $a),
-                                                                                $($rest),+)    };
+    // TODO external entry point for @reduce
+    (@reduce $op:ident, $acc:tt)                       => { lisp!($acc)          };
+    (@reduce $op:ident, $acc:tt, $a:tt)                => { lisp!(@reduce $op,
+                                                                  ($op $acc $a)) };
+    (@reduce $op:ident, $acc:tt, $a:tt, $($rest:tt),+) => { lisp!(@reduce $op,
+                                                                  ($op $acc $a),
+                                                                  $($rest),+)    };
 
     // macro calls
-    (__LIST__ $mac:ident, !) => {
+    (@list $mac:ident, !) => {
         $mac!()
     };
-    (__LIST__ $mac:ident, !, $($arg:tt),*) => {
+    (@list $mac:ident, !, $($arg:tt),*) => {
         $mac!($(lisp!($arg)),*)
     };
 
     // struct constructors
-    (__LIST__ $name:ident, ., $(($member:ident $val:tt)),*) => {
+    (@list $name:ident, ., $(($member:ident $val:tt)),*) => {
         $name { $($member: lisp!($val))* }
     };
 
     // function calls
-    (__LIST__ $name:expr) => {
+    (@list $name:expr) => {
         lisp!($name)()
     };
-    (__LIST__ $name:expr, $($arg:tt),*) => {
+    (@list $name:expr, $($arg:tt),*) => {
         lisp!($name)($(lisp!($arg)),*)
     };
 
     // one expression
     ($e:expr) => ($e);
-    (__PAT__ $p:pat) => ($p);
 }
