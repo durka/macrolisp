@@ -1,4 +1,5 @@
-#[macro_use] extern crate macrolisp;
+#[macro_use]
+extern crate macrolisp;
 use macrolisp::prelude::*;
 
 macro_rules! ck {
@@ -49,7 +50,9 @@ fn main() {
          (factorial_tail_helper a 1))
     );
 
-    struct IntegralFloat { i: i32 }
+    struct IntegralFloat {
+        i: i32,
+    }
     impl std::ops::Add for IntegralFloat {
         type Output = f32;
         fn add(self, rhs: Self) -> Self::Output {
@@ -134,4 +137,3 @@ fn lambdarec_cannot_capture() {
     println!("num = {}", ck!(num, 10));
 }
 */
-

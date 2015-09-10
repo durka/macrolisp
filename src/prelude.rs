@@ -9,7 +9,7 @@ macro_rules! define_binary_op {
             a.$func(b)
         }
     };
-    
+
     ($($name:ident, $md:ident::$trt:ident, $func:ident);*) => {
         $(define_binary_op!($name, $md::$trt, $func);)*
     }
@@ -23,7 +23,7 @@ macro_rules! define_unary_op {
             a.$func()
         }
     };
-    
+
     ($($name:ident, $md:ident::$trt:ident, $func:ident);*) => {
         $(define_unary_op!($name, $md::$trt, $func);)*
     }
@@ -37,7 +37,7 @@ macro_rules! define_comparison_op {
             a.$func(&b)
         }
     };
-    
+
     ($($name:ident, $md:ident::$trt:ident, $func:ident);*) => {
         $(define_comparison_op!($name, $md::$trt, $func);)*
     }
@@ -63,4 +63,3 @@ define_comparison_op!(
                   _lt, cmp::PartialOrd, lt;
                   _ge, cmp::PartialOrd, ge;
                   _le, cmp::PartialOrd, le);
-

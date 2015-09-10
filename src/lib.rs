@@ -17,7 +17,7 @@ pub mod prelude;
         // $s MUST NOT be "self"
         // recurse by calling ($s ...)
         // FIXME recursive lambdas can't capture variables
-        
+
         lisp!((rust { fn $s($($argn: $argt),*) -> $ret { $(lisp!($body));* } $s }))
     }};
     ((defn $name:ident (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
@@ -73,7 +73,7 @@ pub mod prelude;
     (($($elem:tt)*)) => {
         lisp!(__LIST__ $($elem),*)
     };
-    
+
     // parsers for unary and binary operators
     (__LIST__ -,    $arg:tt   ) => { lisp!(__UNARY_OP__  _neg,   $arg   ) };
     (__LIST__ !,    $arg:tt   ) => { lisp!(__UNARY_OP__  _not,   $arg   ) };
@@ -137,4 +137,3 @@ pub mod prelude;
     ($e:expr) => ($e);
     (__PAT__ $p:pat) => ($p);
 }
-
