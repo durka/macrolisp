@@ -1,5 +1,5 @@
-use std::ops;
-use std::cmp;
+use core::ops;
+use core::cmp;
 
 macro_rules! define_binary_op {
     ($name:ident, $md:ident::$trt:ident, $func:ident) => {
