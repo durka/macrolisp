@@ -3,14 +3,12 @@
 pub mod prelude;
 
 // TODO documentation
+// TODO attributes
 // TODO MACROS
 #[macro_export] macro_rules! lisp {
     // empty
     () => (());
     (()) => (());
-
-    // patterns are special snowflakes
-    (@pat $p:pat) => ($p);
 
     // special forms
     ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
