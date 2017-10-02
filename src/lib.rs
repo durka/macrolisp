@@ -11,6 +11,16 @@ pub mod prelude;
     (()) => (());
 
     // special forms
+    ((ns $($ns_form:tt)*) $($body:tt)*) => {
+        $(lisp!($ns_form);)*
+        $(lisp!($body);)*
+    };
+    ((extern [$($krate:tt)*])) => {
+        $(lisp!(@krate $krate);)*
+    };
+    ((use [$($uze:tt)*])) => {
+        $(lisp!(@uze $uze);)*
+    };
     ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
         // regular lambda
         |$($argn:$argt),*| -> $ret { $(lisp!($body));* }
@@ -114,6 +124,25 @@ pub mod prelude;
     (@reduce $op:ident, $acc:tt, $a:tt, $($rest:tt),+) => { lisp!(@reduce $op,
                                                                   ($op $acc $a),
                                                                   $($rest),+)    };
+    // ns form helpers
+    (@krate $(^$attr:meta)* $krate:ident) => {
+        $(#[$attr:meta])*
+        extern crate $krate;
+    };
+    (@krate $(^$attr:meta)* ($krate:ident $alias:ident)) => {
+        $(#[$attr:meta])*
+        extern crate $krate as $alias;
+    };
+    (@uze ($($head:ident)*)) => { use $($head)::*; };
+    (@uze ($($head:ident)* { $($multiple:ident)* })) => {
+        lisp!(@uze mult ($($head)*) { $($multiple)* });
+    };
+    (@uze mult $head:tt { $($multiple:ident)* }) => {
+        $(lisp!(@uze mult out $head $multiple);)*
+    };
+    (@uze mult out ($($head:ident)*) $multiple:ident) => {
+        use $($head)::*::$multiple;
+    };
 
     // macro calls
     (@list $mac:ident, !) => {
