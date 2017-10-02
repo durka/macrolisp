@@ -21,6 +21,10 @@ pub mod prelude;
     ((use [$($uze:tt)*])) => {
         $(lisp!(@uze $uze);)*
     };
+    ((lambda ($($argn:ident)*) $($body:tt)*)) => {
+        // regular lambda
+        |$($argn),*| { $(lisp!($body));* }
+    };
     ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
         // regular lambda
         |$($argn:$argt),*| -> $ret { $(lisp!($body));* }
