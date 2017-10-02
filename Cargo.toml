@@ -1,5 +1,12 @@
 [package]
+authors = ["Alex Burka <aburka@seas.upenn.edu>"]
 name = "macrolisp"
 version = "0.2.0"
-authors = ["Alex Burka <aburka@seas.upenn.edu>"]
+
+[dev-dependencies]
+bytes         = "0.4.5"
+futures       = "0.1.16"
+tokio-io      = "0.1.3"
+tokio-proto   = "0.1.1"
+tokio-service = "0.1.0"
 
