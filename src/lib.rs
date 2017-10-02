@@ -213,16 +213,24 @@ pub mod prelude;
     };
 
     // struct constructors
-    (@list $name:ident, ., $(($member:ident $val:tt)),*) => {
+    (@list (:: $($name:tt)*), . $(, ($member:ident $val:tt))*) => {
+        $($name)* { $($member: lisp!($val))* }
+    };
+    (@list $name:ident, . $(, ($member:ident $val:tt))*) => {
         $name { $($member: lisp!($val))* }
     };
 
     // function calls
-    (@list $name:expr) => {
-        lisp!($name)()
+    (@list (:: $name:path) $(, $arg:tt),*) => {
+        $name($(lisp!($arg)),*)
     };
-    (@list $name:expr, $($arg:tt),*) => {
+    (@list $name:expr $(, $arg:tt)*) => {
         lisp!($name)($(lisp!($arg)),*)
+    };
+
+    // method calls
+    (@list ., $name:ident, $subj:tt $(, $arg:tt)*) => {
+        lisp!($subj).$name($(lisp!($arg)),*)
     };
 
     // one expression
