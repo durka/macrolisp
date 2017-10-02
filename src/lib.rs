@@ -21,21 +21,22 @@ pub mod prelude;
     ((use [$($uze:tt)*])) => {
         $(lisp!(@uze $uze);)*
     };
-    ((lambda ($($argn:ident)*) $($body:tt)*)) => {
+    ((lambda [$($argn:ident)*] $($body:tt)*)) => {
         // regular lambda
         |$($argn),*| { $(lisp!($body));* }
     };
-    ((lambda (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
+    ((lambda ([$(($argn:ident $argt:ty))*] $ret:ty) $($body:tt)*)) => {
         // regular lambda
         |$($argn:$argt),*| -> $ret { $(lisp!($body));* }
     };
-    ((lambda $s:ident (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {{
+    ((lambda $s:ident ([$(($argn:ident $argt:ty))*] $ret:ty) $($body:tt)*)) => {{
         // recursive lambda
         // $s MUST NOT be "self"
         // recurse by calling ($s ...)
         // FIXME recursive lambdas can't capture variables
 
-        lisp!((rust { fn $s($($argn: $argt),*) -> $ret { $(lisp!($body));* } $s }))
+        fn $s($($argn: $argt),*) -> $ret { $(lisp!($body));* }
+        $s
     }};
     ((defn $name:ident () $($body:tt)*)) => {
         fn $name() {
