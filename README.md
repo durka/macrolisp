@@ -18,6 +18,14 @@ A Lispy syntax for Rust.
 
 See the [tests](tests/test.rs) for full usage examples.
 
+The `tokio_echo` example is runnable:
+
+```
+cargo run --example tokio_echo
+```
+
+Now open another terminal and send data to `localhost:12345`; it will be echoed back to you.
+
 To use MacroLisp, import the crate with the `#[macro_use]` attribute. You'll also want to bring in the prelude to get operators:
 
 ```rust
