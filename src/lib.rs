@@ -106,13 +106,13 @@ pub mod prelude;
     ((if $cond:tt $yes:tt $no:tt)) => {
         if lisp!($cond) { lisp!($yes) } else { lisp!($no) }
     };
-    (@list while, $cond:tt, $($body:tt),*) => {
+    ((while $cond:tt $($body:tt)*)) => {
         while lisp!($cond) { $(lisp!($body));* }
     };
     // TODO for loops
-    (@list match, $var:tt, $(($cond:tt $arm:tt)),*) => {
+    ((match $var:tt $(($cond:pat) $arm:tt)*)) => {
         match lisp!($var) {
-            $(lisp!(@pat $cond) => lisp!($arm)),*
+            $($cond => lisp!($arm)),*
         }
     };
     ((do $($stmts:tt)*)) => {{
