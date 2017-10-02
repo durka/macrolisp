@@ -20,40 +20,40 @@ lisp! {
     (defstruct LineProto)
     (defstruct Echo)
 
-    (defimpl (LineCodec: Decoder)
+    (defimpl (Decoder) (for LineCodec)
         (deftype Item String)
         (deftype Error io::Error)
 
-        (defn decode (((self &mut Self) (buf &mut BytesMut))
+        (defn decode ([(self &mut Self) (buf &mut BytesMut)]
                       io::Result<Option<String>>)
 
             (match (.position (.iter buf)
-                              (lambda (b)
+                              (lambda [b]
                                   (== (* b)
                                       b'\n')))
 
-                ((Some(i))   (let ((line (.split_to buf i))) // remove the serialized frame from the buffer.
-                            
-                                 (.split_to buf 1) // Also remove the '\n'
+                (Some(i))   (let [line (.split_to buf i)] // remove the serialized frame from the buffer.
+                           
+                                (.split_to buf 1) // Also remove the '\n'
 
-                                 (match ((:: str::from_utf8) (& line))
-                                     ((Ok(s))    (Ok (Some (.to_string s))))
-                                     ((Err(_))   (Err ((:: io::Error::new) ((:: io::ErrorKind::Other) .) "invalid UTF-8"))))))
+                                (match ((:: str::from_utf8) (& line))
+                                    (Ok(s))    (Ok (Some (.to_string s)))
+                                    (Err(_))   (Err ((:: io::Error::new) ((:: io::ErrorKind::Other) .) "invalid UTF-8"))))
 
-                ((None)      (Ok None)))))
+                (None)      (Ok None))))
 
-    (defimpl (LineCodec: Encoder)
+    (defimpl (Encoder) (for LineCodec)
         (deftype Item String)
         (deftype Error io::Error)
 
-        (defn encode (((self &mut Self) (msg String) (buf &mut BytesMut))
+        (defn encode ([(self &mut Self) (msg String) (buf &mut BytesMut)]
                       io::Result<()>)
 
             (.extend buf (.as_bytes msg))
             (.extend buf b"\n")
             (Ok ())))
 
-    (defimpl <T> (LineProto: ServerProto<T>)
+    (defimpl <T> (ServerProto<T>) (for LineProto)
         (where (T AsyncRead)
                (T AsyncWrite)
                (T 'static))
@@ -66,11 +66,11 @@ lisp! {
         // boilerplate to hook in the codec
         (deftype Transport Framed<T, LineCodec>)
         (deftype BindTransport Result<Self::Transport, io::Error>)
-        (defn bind_transport (((self &Self) (io T))
+        (defn bind_transport ([(self &Self) (io T)]
                               Self::BindTransport)
-            (Ok (.framed io LineCodec))))
+            (Ok (.framed io (LineCodec.)))))
 
-    (defimpl (Echo: Service)
+    (defimpl (Service) (for Echo)
         // These types must match the corresponding protocol types;
         (deftype Request String)
         (deftype Response String)
@@ -82,17 +82,17 @@ lisp! {
         (deftype Future BoxFuture<Self::Response, Self::Error>)
 
         // Produce a future for computing a response from a request.
-        (defn call (((self &Self) (req Self::Request))
+        (defn call ([(self &Self) (req Self::Request)]
                     Self::Future)
             // In this case, the response is immediate.
             (.boxed ((:: future::ok) req))))
 
-    (defn main (() ())
-        (let ((addr     (.unwrap (.parse "0.0.0.0:12345"))) // Specify the localhost address
-              (server   ((:: TcpServer::new) LineProto addr))) // The builder requires a protocol and an address
+    (defn main ([] ())
+        (let [addr     (.unwrap (.parse "0.0.0.0:12345")) // Specify the localhost address
+              server   ((:: TcpServer::new) (LineProto.) addr)] // The builder requires a protocol and an address
             // We provide a way to *instantiate* the service for each new
             // connection; here, we just immediately return a new instance.
-            (.serve server (lambda ()
-                               (Ok Echo)))))
+            (.serve server (lambda []
+                               (Ok (Echo.))))))
 
 }
