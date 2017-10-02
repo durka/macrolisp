@@ -120,25 +120,16 @@ pub mod prelude;
     }};
 
     // variables
-    ((let ((mut $var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
-        let mut $var = lisp!($val);
-        lisp!((let ($($bindings)+) $($body)*))
+    ((let [] $($body:tt)*)) => {{
+        $(lisp!($body));*
     }};
-    ((let (($var:ident $val:tt) $($bindings:tt)+) $($body:tt)*)) => {{
+    ((let [mut $var:ident $val:tt $($bindings:tt)*] $($body:tt)*)) => {{
+        let mut $var = lisp!($val);
+        lisp!((let [$($bindings)*] $($body)*))
+    }};
+    ((let [$var:ident $val:tt $($bindings:tt)*] $($body:tt)*)) => {{
         let $var = lisp!($val);
-        lisp!((let ($($bindings)+) $($body)*))
-    }};
-    ((let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
-        let mut $var = lisp!($val);
-        $(lisp!($body));*
-    }};
-    ((let ((mut $var:ident $val:tt)) $($body:tt)*)) => {{
-        let mut $var = lisp!($val);
-        $(lisp!($body));*
-    }};
-    ((let (($var:ident $val:tt)) $($body:tt)*)) => {{
-        let $var = lisp!($val);
-        $(lisp!($body));*
+        lisp!((let [$($bindings)*] $($body)*))
     }};
     ((:= $var:ident $val:tt)) => {
         $var = lisp!($val);
