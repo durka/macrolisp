@@ -37,9 +37,72 @@ pub mod prelude;
 
         lisp!((rust { fn $s($($argn: $argt),*) -> $ret { $(lisp!($body));* } $s }))
     }};
-    ((defn $name:ident (($(($argn:ident $argt:ty))*) $ret:ty) $($body:tt)*)) => {
-        fn $name($($argn:$argt),*) -> $ret { $(lisp!($body));* }
+    ((defn $name:ident () $($body:tt)*)) => {
+        fn $name() {
+            $(lisp!($body));*
+        }
     };
+    ((defn $name:ident ([($selph:ident) $(($argn:ident $argt:ty))*] $ret:ty) $($body:tt)*)) => {
+        fn $name($selph $(, $argn:$argt)*) -> $ret {
+            $(lisp!($body));*
+        }
+    };
+    ((defn $name:ident ([(&$selph:ident) $(($argn:ident $argt:ty))*] $ret:ty) $($body:tt)*)) => {
+        fn $name(&$selph $(, $argn:$argt)*) -> $ret {
+            $(lisp!($body));*
+        }
+    };
+    ((defn $name:ident ([(&mut $selph:ident) $(($argn:ident $argt:ty))*] $ret:ty) $($body:tt)*)) => {
+        fn $name(&mut $selph $(, $argn:$argt)*) -> $ret {
+            $(lisp!($body));*
+        }
+    };
+    ((defn $name:ident ([($selph:ident: Box<Self>) $(($argn:ident $argt:ty))*] $ret:ty) $($body:tt)*)) => {
+        fn $name($selph: Box<Self> $(, $argn:$argt)*) -> $ret {
+            $(lisp!($body));*
+        }
+    };
+    ((defn $name:ident ([$(($argn:ident $argt:ty))*] $ret:ty) $($body:tt)*)) => {
+        fn $name($($argn:$argt),*) -> $ret {
+            $(lisp!($body));*
+        }
+    };
+
+    ((defstruct $name:ident $(($typ:ty))*)) => {
+        struct $name($($typ),*);
+    };
+    ((defstruct $name:ident $(($field:ident $typ:ty))*)) => {
+        struct $name { $($field: $typ),* }
+    };
+    ((defstruct $name:ident <$($gen:ident)*>)) => {
+        struct $name<$($gen),*>;
+    };
+    ((defstruct $name:ident <$($gen:ident)*> (where $(($wty:ident $($wtr:tt)*))*) $(($typ:ty))*)) => {
+        struct $name<$($gen),*>($($typ),*) where $($wty: $($wtr)*),*;
+    };
+    ((defstruct $name:ident <$($gen:ident)*> (where $(($wty:ident $($wtr:tt)*))*) $(($field:ident $typ:ty))*)) => {
+        struct $name<$($gen),*> where $($wty: $($wtr)*),* { $($field: $typ),* }
+    };
+
+    ((deftype $name:ident $typ:ty)) => { type $name = $typ; };
+    ((deftype $name:ident <$($gen:ident)*> $typ:ty)) => { type $name<$($gen),*> = $typ; };
+
+    ((defimpl ($trate:ty) (for $typ:ty) $($body:tt)*)) => {
+        impl $trate for $typ {
+            $(lisp!($body);)*
+        }
+    };
+    ((defimpl <$($gen:ident)*> ($trate:ty) (for $typ:ty) (where $(($wty:ident $($wtr:tt)*))*) $($body:tt)*)) => {
+        impl<$($gen),*> $trate for $typ where $($wty: $($wtr)*),* {
+            $(lisp!($body);)*
+        }
+    };
+    ((defimpl <$($gen:ident)*> ($trate:ty) (for $typ:ty) $($body:tt)*)) => {
+        impl<$($gen),*> $trate for $typ where $($wty: $($wtr)*),* {
+            $(lisp!($body);)*
+        }
+    };
+
     ((if $cond:tt $yes:tt $no:tt)) => {
         if lisp!($cond) { lisp!($yes) } else { lisp!($no) }
     };
