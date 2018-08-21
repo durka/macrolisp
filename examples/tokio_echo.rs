@@ -9,7 +9,7 @@ lisp! {
                  tokio_service])
         (use [(std {io str})
               (bytes BytesMut)
-              (futures {future Future BoxFuture})
+              (futures {future Future})
               (tokio_io {AsyncRead AsyncWrite})
               (tokio_io codec {Encoder Decoder Framed})
               (tokio_proto TcpServer)
@@ -79,13 +79,13 @@ lisp! {
         (deftype Error io::Error)
 
         // The future for computing the response; box it for simplicity.
-        (deftype Future BoxFuture<Self::Response, Self::Error>)
+        (deftype Future Box<Future<Item=Self::Response, Error=Self::Error>>)
 
         // Produce a future for computing a response from a request.
         (defn call ([(self &Self) (req Self::Request)]
                     Self::Future)
             // In this case, the response is immediate.
-            (.boxed ((:: future::ok) req))))
+            ((:: Box::new) ((:: future::ok) req))))
 
     (defn main ([] ())
         (let [addr     (.unwrap (.parse "0.0.0.0:12345")) // Specify the localhost address
