@@ -1,7 +1,7 @@
 [package]
 authors = ["Alex Burka <aburka@seas.upenn.edu>"]
 name = "macrolisp"
-version = "0.2.0"
+version = "0.2.1"
 
 [dev-dependencies]
 bytes         = "0.4.5"
