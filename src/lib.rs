@@ -214,6 +214,9 @@ pub mod prelude;
     };
 
     // struct constructors
+    (@list (:: $($name:tt)*), .) => {
+        $($name)*
+    };
     (@list (:: $($name:tt)*), . $(, ($member:ident $val:tt))*) => {
         $($name)* { $($member: lisp!($val))* }
     };
